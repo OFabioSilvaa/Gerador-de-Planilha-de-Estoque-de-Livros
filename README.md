@@ -48,9 +48,3 @@ A planilha contém as seguintes colunas:
 - **Valor Total**
 
 As fórmulas de **lucro** e **valor total** são calculadas diretamente no Excel.
-
-## 🧪 Como usar
-
-1. Clone este repositório:
-   ```bash
-   git remote set-url origin https://github.com/OFabioSilvaa/Gerador-de-Planilha-de-Estoque-de-Livros.git
