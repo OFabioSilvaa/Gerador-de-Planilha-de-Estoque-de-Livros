@@ -53,5 +53,4 @@ As fórmulas de **lucro** e **valor total** são calculadas diretamente no Excel
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/seu-usuario/nome-do-repositorio.git
-   cd nome-do-repositorio
+   git remote set-url origin https://github.com/OFabioSilvaa/Gerador-de-Planilha-de-Estoque-de-Livros.git
