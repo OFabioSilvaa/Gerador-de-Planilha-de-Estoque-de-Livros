@@ -1,13 +1,11 @@
 import random
-from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
-#Configurações do Projeto
 NUM_LIVROS = 50
 MARGEM_LUCRO = 0.30
 
-# Listas de Dados
+#  Definindo Listas para geração de Dados Aleatórios
 nomes_livros_base = [
     "A Arte da Guerra", "1984", "Dom Quixote", "O Pequeno Príncipe",
     "Cem Anos de Solidão", "Crime e Castigo", "Orgulho e Preconceito",
@@ -22,14 +20,13 @@ editoras = [
     "Editora Alfa", "Editora Beta", "Editora Gama", "Editora Delta",
     "HarperCollins", "Penguin Random House", "Rocco", "Companhia das Letras"
 ]
-
+# Gerando dados aleatórios para um livro
 def gerar_dados_livro():
-    # Gerando dados fictícios para um único livro.
     nome = random.choice(nomes_livros_base) + f" - Vol. {random.randint(1, 3)}" if random.random() < 0.3 else random.choice(nomes_livros_base)
     editora = random.choice(editoras)
-    valor_compra = round(random.uniform(15.00, 150.00), 2) 
-    notas = random.randint(1, 5) 
-    quantidade = random.randint(1, 200) 
+    valor_compra = round(random.uniform(15.00, 150.00), 2)
+    notas = random.randint(1, 5)
+    quantidade = random.randint(1, 200)
 
     return {
         "Nome do Livro": nome,
@@ -39,19 +36,19 @@ def gerar_dados_livro():
         "Quantidade": quantidade
     }
 
+# Cria uma planilha Excel com dados de estoque de livros
 def criar_planilha_estoque(nome_arquivo="estoque_livros.xlsx"):
-    # Cria e preenche a planilha Excel com dados de estoque.
     wb = Workbook()
     ws = wb.active
     ws.title = "Estoque de Livros"
-    # Cabeçalhos 
+
     headers = [
         "Nome do Livro", "Editora", "Valor de Compra", "Notas", "Quantidade",
         "Preço de Venda", "Lucro Total", "Valor Total"
     ]
     ws.append(headers)
-    # Geração e Inserção de Dados
-    for i in range(NUM_LIVROS):
+
+    for _ in range(NUM_LIVROS):
         dados_livro = gerar_dados_livro()
         linha_dados = [
             dados_livro["Nome do Livro"],
@@ -61,35 +58,32 @@ def criar_planilha_estoque(nome_arquivo="estoque_livros.xlsx"):
             dados_livro["Quantidade"]
         ]
         ws.append(linha_dados)
-
         current_row = ws.max_row
-        # Colunas:
-        # C: Valor de Compra
-        # E: Quantidade
-        # F: Preço de Venda
-        # G: Lucro Total
-        # H: Valor Total
 
-        # Fórmula para Preço de Venda (Coluna F): Valor de Compra * (1 + MARGEM_LUCRO)
-        ws[f'F{current_row}'] = f'={get_column_letter(3)}{current_row}*(1+{MARGEM_LUCRO})'
-        # Fórmula para Lucro Total (Coluna G): (Preço de Venda - Valor de Compra) * Quantidade
-        ws[f'G{current_row}'] = f'=({get_column_letter(6)}{current_row}-{get_column_letter(3)}{current_row})*{get_column_letter(5)}{current_row}'
-         # Fórmula para Valor Total (Coluna H): Preço de Venda * Quantidade
-        ws[f'H{current_row}'] = f'={get_column_letter(6)}{current_row}*{get_column_letter(5)}{current_row}'
-        
+        # Fórmulas e Totais
+        preco_venda_formula = f"=C{current_row}*(1+{MARGEM_LUCRO})"
+        lucro_total_formula = f"=(F{current_row}-C{current_row})*E{current_row}"
+        valor_total_formula = f"=F{current_row}*E{current_row}"
+
+        ws[f"F{current_row}"] = preco_venda_formula
+        ws[f"G{current_row}"] = lucro_total_formula
+        ws[f"H{current_row}"] = valor_total_formula
+
+    # Ajustando largura das colunas
     for col in ws.columns:
         max_length = 0
-        column = get_column_letter(col[0].column)
+        column = col[0].column_letter
         for cell in col:
             try:
-                if cell.value and len(str(cell.value)) > max_length:
-                    max_length = len(str(cell.value))
+                if cell.value is not None:
+                    length = len(str(cell.value))
+                    if length > max_length:
+                        max_length = length
             except:
                 pass
-        adjusted_width = (max_length + 2)
-        ws.column_dimensions[column].width = adjusted_width
+        ws.column_dimensions[column].width = max_length + 2
 
-    # Salvar a planilha
+# Salvando
     wb.save(nome_arquivo)
     print(f"Planilha '{nome_arquivo}' criada com sucesso!")
 
